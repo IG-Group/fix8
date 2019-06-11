@@ -315,16 +315,16 @@ void Connection::start()
 void Connection::stop()
 {
 	scout_debug << "Connection::stop()";
-	_writer.stop();
-	_writer.join();
-	_reader.stop();
-	_reader.join();
 	try {
 		_reader.socket()->shutdownReceive();
 	} catch(const Poco::Net::NetException& ex) {
 		scout_warn << "Connection::stop() msg:" << ex.displayText();
 		_session.do_state_change(States::st_session_terminated);
 	}
+	_writer.stop();
+	_reader.stop();
+	_writer.join();
+	_reader.join();
 }
 
 //-------------------------------------------------------------------------------------------------
