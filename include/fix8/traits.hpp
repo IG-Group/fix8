@@ -209,6 +209,9 @@ struct FieldTrait_Hash_Array
    }
 
    ~FieldTrait_Hash_Array() { delete[] _arr; }
+
+   FieldTrait_Hash_Array(const FieldTrait_Hash_Array &) = delete;
+   FieldTrait_Hash_Array& operator=(const FieldTrait_Hash_Array &) = delete;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -235,10 +238,11 @@ public:
 	}
 
 private:
-	size_t _reserve;
-	size_t _sz, _rsz;
-	FieldTrait *_arr;
-	const FieldTrait_Hash_Array *_ftha;
+	size_t _reserve = 0;
+	size_t _sz = 0;
+	size_t _rsz = 0;
+	FieldTrait *_arr = nullptr;
+	const FieldTrait_Hash_Array *_ftha = nullptr;
 
 	using internal_result = std::pair<iterator, iterator>;
 	using const_internal_result = std::pair<const_iterator, const_iterator>;
@@ -249,31 +253,49 @@ public:
 	  \param sz number of elements in set to copy
 	  \param ftha pointer to field hash array */
 	presorted_set(const_iterator arr_start, const size_t sz, const FieldTrait_Hash_Array *ftha)
-		: _reserve(), _sz(sz), _arr(new FieldTrait[_sz]), _ftha(ftha)
+		: _sz(sz), _arr(new FieldTrait[_sz]), _ftha(ftha)
 			{ memcpy(_arr, arr_start, _sz * sizeof(FieldTrait)); }
 
 	/*! ctor - initialise an empty set; defer memory allocation;
 	  \param arr_start pointer to start of static array to copy elements from
 	  \param sz number of elements to initially allocate
 	  \param reserve percentage of sz to keep in reserve */
-	presorted_set(const_iterator arr_start, const size_t sz, const size_t reserve=FIX8_RESERVE_PERCENT) : _reserve(reserve),
-		_sz(sz), _rsz(_sz + calc_reserve(_sz, _reserve)), _arr(new FieldTrait[_rsz]), _ftha()
+	presorted_set(const_iterator arr_start, const size_t sz, const size_t reserve=FIX8_RESERVE_PERCENT)
+		: _reserve(reserve), _sz(sz), _rsz(_sz + calc_reserve(_sz, _reserve)), _arr(new FieldTrait[_rsz])
 			{ memcpy(_arr, arr_start, _sz * sizeof(FieldTrait)); }
 
 	/*! copy ctor
 	  \param from presorted_set object to copy */
-	presorted_set(const presorted_set& from) : _reserve(from._reserve),
-		_sz(from._sz), _rsz(from._rsz), _arr(new FieldTrait[_rsz]), _ftha(from._ftha)
+	presorted_set(const presorted_set& from)
+		: _reserve(from._reserve), _sz(from._sz), _rsz(from._rsz), _arr(new FieldTrait[_rsz]), _ftha(from._ftha)
 			{ memcpy(_arr, from._arr, _sz * sizeof(FieldTrait)); }
 
 	/*! ctor - initialise an empty set; defer memory allocation;
 	  \param sz number of elements to initially allocate
 	  \param reserve percentage of sz to keep in reserve */
-	explicit presorted_set(const size_t sz=0, const size_t reserve=FIX8_RESERVE_PERCENT) : _reserve(reserve),
-		_sz(sz), _rsz(_sz + calc_reserve(_sz, _reserve)), _arr(), _ftha() {}
+	explicit presorted_set(const size_t sz=0, const size_t reserve=FIX8_RESERVE_PERCENT)
+		: _reserve(reserve), _sz(sz), _rsz(_sz + calc_reserve(_sz, _reserve)) {}
 
 	/// dtor
 	~presorted_set() { delete[] _arr; }
+
+	presorted_set& operator=(const presorted_set& from) {
+		if (this != &from) {
+			presorted_set tmp(from);
+			swap(tmp);
+		}
+		return *this;
+	}
+
+	void swap(presorted_set& from) {
+		if (this != &from) {
+			std::swap(_reserve, from._reserve);
+			std::swap(_sz, from._sz);
+			std::swap(_rsz, from._rsz);
+			std::swap(_arr, from._arr);
+			std::swap(_ftha, from._ftha);
+		}
+	}
 
 	/*! Find an element with the given value
 	  \param what element to find
