@@ -300,8 +300,8 @@ Logger *Configuration::create_logger(const XmlElement *from, const Logtype ltype
 
 				get_logname(which, logname, sid); // only applies to file loggers
 				if (flags & Logger::xml)
-					return new XmlFileLogger(logname, flags, levels, delim, positions, get_logfile_rotation(which));
-				return new FileLogger(logname, flags, levels, delim, positions, get_logfile_rotation(which));
+					return new XmlFileLogger(logname, flags, levels, delim, positions, get_logfile_rotation(which), get_logfile_rotation_size(which));
+				return new FileLogger(logname, flags, levels, delim, positions, get_logfile_rotation(which), get_logfile_rotation_size(which));
 			}
 		}
 	}

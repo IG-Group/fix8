@@ -175,6 +175,38 @@ protected:
 		return def;
 	}
 
+	/*! Find a human readable numeric attribute in the given XmlElement.
+	  \param default type
+	  \param from the xml entity to search
+	  \param tag the tag to find
+	  \param def the default value if not found
+	  \return the found attribute value or the default value if not found */
+	template<typename T, typename = std::enable_if_t<std::is_integral<T>::value>>
+	T find_or_default_h(const XmlElement *from, const std::string& tag, const T def) const
+	{
+		const std::string ret =
+			from && from->HasAttr(tag) ? from->FindAttr(tag, std::string()) :
+			_default ? _default->FindAttr(tag, std::string()) :
+			std::string();
+
+		if (ret.empty())
+			return def;
+		switch (ret.back())
+		{
+		case 'k':
+		case 'K':
+			return static_cast<T>(std::atoll(ret.c_str()) * std::kilo::num / std::kilo::den);
+		case 'm':
+		case 'M':
+			return static_cast<T>(std::atoll(ret.c_str()) * std::mega::num / std::mega::den);
+		case 'g':
+		case 'G':
+			return static_cast<T>(std::atoll(ret.c_str()) * std::giga::num / std::giga::den);
+		default:
+			return static_cast<T>(std::atoll(ret.c_str()));
+		}
+	}
+
 private:
 	/*! Load a repeating group into a supplied map.
 	  \param tag the tag to find
@@ -337,6 +369,13 @@ public:
 	  \return the logfile rotation value or 5 if not found */
 	unsigned get_logfile_rotation(const XmlElement *from, const unsigned def=defaults::log_rotation) const
 		{ return find_or_default(from, "rotation", def); }
+
+	/*! Extract the logfile size threshold.
+	  \param from xml entity to search
+	  \param def default value if not found
+	  \return the logfile rotation value or limit::max if not found */
+	std::streamoff get_logfile_rotation_size(const XmlElement *from, std::streamoff def=defaults::log_rotate_size) const
+		{ return find_or_default_h(from, "rotation_size", def); }
 
 	/*! Extract the heartbeat interval from a session entity.
 	  \param from xml entity to search

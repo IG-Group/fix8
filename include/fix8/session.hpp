@@ -192,6 +192,7 @@ namespace defaults
 		hb_interval=30,
 		connect_timeout=10,
 		log_rotation=5,
+		log_rotate_size=std::numeric_limits<std::streamoff>::max(),
 		verification_depth=9
 	};
 }

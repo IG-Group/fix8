@@ -253,8 +253,8 @@ char Logger::get_thread_code(thread_id_t tid)
 
 //-------------------------------------------------------------------------------------------------
 FileLogger::FileLogger(const string& fname, const LogFlags flags, const Levels levels,
-	const std::string delim, const LogPositions positions, const unsigned rotnum)
-	: Logger(flags, levels, delim, positions), _rotnum(rotnum)
+	const std::string delim, const LogPositions positions, const unsigned rotnum, const streamoff_type rotsize)
+	: Logger(flags, levels, delim, positions), _rotnum(rotnum), _rotsize(rotsize)
 {
    if (!fname.empty())
    {
@@ -309,6 +309,17 @@ bool FileLogger::rotate(bool force)
       throw LogfileException(thislFile);
 
 	return true;
+}
+
+void FileLogger::process_logline(LogElement *msg_ptr)
+{
+	{
+		f8_scoped_lock guard(_rotsize_mutex);
+		if (_ofs && get_rotate_size() < _ofs->tellp())
+			rotate(true);
+	}
+
+	Logger::process_logline(msg_ptr);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -370,6 +381,12 @@ BCLogger::BCLogger(const string& ip, const unsigned port, const LogFlags flags, 
 //-------------------------------------------------------------------------------------------------
 void XmlFileLogger::process_logline(LogElement *msg_ptr)
 {
+	{
+		f8_scoped_lock guard(_rotsize_mutex);
+		if (_ofs && get_rotate_size() < _ofs->tellp())
+			rotate(true);
+	}
+
 	f8String spacer(3, ' ');
 	ostringstream ostr;
 
@@ -400,4 +417,3 @@ void XmlFileLogger::process_logline(LogElement *msg_ptr)
 	f8_scoped_lock guard(_mutex);
 	get_stream() << ostr.str() << endl;
 }
-
