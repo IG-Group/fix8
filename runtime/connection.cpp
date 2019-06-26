@@ -316,7 +316,7 @@ void Connection::stop()
 {
 	scout_debug << "Connection::stop()";
 	try {
-		_reader.socket()->shutdownReceive();
+		_reader.socket()->shutdown();
 	} catch(const Poco::Net::NetException& ex) {
 		scout_warn << "Connection::stop() msg:" << ex.displayText();
 		_session.do_state_change(States::st_session_terminated);
