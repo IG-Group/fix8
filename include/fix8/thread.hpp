@@ -51,8 +51,7 @@ HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
 //----------------------------------------------------------------------------------------
 namespace FIX8
 {
-
-template<typename T> using f8_atomic = std::atomic <T>;
+template<typename T> using f8_atomic = std::atomic<T>;
 
 #if (FIX8_THREAD_SYSTEM == FIX8_THREAD_STDTHREAD)
 	using thread_id_t = std::thread::id;
@@ -68,7 +67,7 @@ class _f8_threadcore
 	pthread_attr_t _attr;
 	pthread_t _tid;
 #elif (FIX8_THREAD_SYSTEM == FIX8_THREAD_STDTHREAD)
-	std::atomic<std::thread*> _thread_ptr;
+	std::atomic<std::thread*> _thread_ptr{nullptr};
 #endif
 
 #if (FIX8_THREAD_SYSTEM == FIX8_THREAD_PTHREAD)
@@ -77,6 +76,28 @@ class _f8_threadcore
 #else
 	template<typename T>
 	static void _run(void *what) { (*static_cast<T *>(what))(); }
+#endif
+
+#if (FIX8_THREAD_SYSTEM == FIX8_THREAD_STDTHREAD)
+	int _join(std::thread* thread_ptr)
+	{
+		if (thread_ptr)
+		{
+			if (thread_ptr->get_id() == std::this_thread::get_id())
+				return -1;	// join on self
+			try
+			{
+				thread_ptr->join();
+				delete thread_ptr;
+			}
+			catch (const std::system_error &e)
+			{
+				std::string str{"_f8_threadcore::_join: " + std::string(e.what())};
+				throw std::logic_error(std::move(str));
+			}
+		}
+		return 0;
+	}
 #endif
 
 protected:
@@ -88,16 +109,7 @@ protected:
 #elif (FIX8_THREAD_SYSTEM == FIX8_THREAD_STDTHREAD)
 		if (std::thread* thread_ptr = _thread_ptr.exchange(new std::thread(_run<T>, sub)))
 		{
-			try
-			{
-				thread_ptr->join();
-				delete thread_ptr;
-			}
-			catch (const std::system_error &) {
-				std::string str("_f8_threadcore::_start: join called on a joined thread");
-				throw std::logic_error(std::move(str));
-			}
-			throw std::logic_error("_f8_threadcore::_start called on an active thread");
+			std::terminate();
 		}
 #endif
 		return 0;
@@ -112,7 +124,6 @@ public:
 		if (pthread_attr_init(&_attr))
 			throw f8_threadException("pthread_attr_init failure");
 #else
-		: _thread_ptr(nullptr)
 	{
 #endif
 	}
@@ -120,7 +131,7 @@ public:
 	/// Dtor.
 	virtual ~_f8_threadcore()
 	{
-	  join();
+		join();
 #if (FIX8_THREAD_SYSTEM == FIX8_THREAD_PTHREAD)
 		pthread_attr_destroy(&_attr);
 #endif
@@ -143,15 +154,7 @@ public:
 #elif (FIX8_THREAD_SYSTEM == FIX8_THREAD_STDTHREAD)
 		if (std::thread* thread_ptr = _thread_ptr.exchange(nullptr))
 		{
-			try
-			{
-				thread_ptr->join();
-				delete thread_ptr;
-			}
-			catch (const std::system_error &) {
-				std::string str("_f8_threadcore::join: join called on a joined thread");
-				throw std::logic_error(std::move(str));
-			}
+			return _join(thread_ptr);
 		}
 
 		return 0;
@@ -415,11 +418,11 @@ class f8_spin_lock
 
 public:
     f8_spin_lock()
-	 {
+	{
 #ifdef _MSC_VER
 		 _sl.clear(std::memory_order_relaxed); // = ATOMIC_FLAG_INIT # does not compile under vs2013
 #endif
-	 }
+	}
 	~f8_spin_lock() = default;
 
 	void lock() { while (!try_lock()); }

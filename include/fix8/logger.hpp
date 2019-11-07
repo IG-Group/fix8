@@ -177,7 +177,7 @@ public:
 	using LogPositions = std::vector<int>;
 
 protected:
-	f8_mutex _mutex;
+	mutable f8_mutex _mutex;
 	f8_spin_lock _log_spl;
 	LogFlags _flags;
 	Levels _levels;
@@ -364,8 +364,6 @@ protected:
 	std::string _pathname;
 	unsigned _rotnum;
 	streamoff_type _rotsize;
-	f8_mutex _rotsize_mutex;
-
 public:
 	/*! Ctor.
 	    \param pathname pathname to log to
@@ -392,6 +390,10 @@ public:
 
 	/// Return rotate size threshold
 	streamoff_type get_rotate_size() const { return _rotsize; }
+
+	/// Return current file size
+	/// note that by the time you read the value returned by this function real size might have already changed.
+	streamoff_type get_current_file_size() const;
 };
 
 //-------------------------------------------------------------------------------------------------

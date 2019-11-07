@@ -534,7 +534,7 @@ public:
 		  _secured(secured) {}
 
 	/// Dtor.
-  virtual ~Connection() { _session.clear_connection(this); }
+	virtual ~Connection() { _session.clear_connection(this); }
 
 	/*! Get the role for this connection.
 	    \return the role */

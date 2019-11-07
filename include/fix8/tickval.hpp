@@ -134,6 +134,11 @@ public:
 		return *this;
 	}
 
+        /* Returns internal value, usually thats std::chrono::system_clock::time_point */
+        f8_time_point value() const {
+		return _value;
+	}
+
 	/*! Get the current number of elapsed seconds
 	  \return value in seconds */
 	time_t secs() const { return std::chrono::duration_cast<std::chrono::seconds>(_value.time_since_epoch()).count(); }

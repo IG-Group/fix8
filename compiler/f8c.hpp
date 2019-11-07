@@ -156,7 +156,7 @@ struct MessageSpec
 {
 	FieldTraits _fields;
 	GroupMap _groups;
-   uint32_t _group_refcnt, _hash;
+	uint32_t _group_refcnt, _hash;
 	std::string _name, _description, _comment;
 	bool _is_admin;
 
@@ -171,6 +171,7 @@ struct MessageSpec
 	    \return stream */
 	friend std::ostream& operator<<(std::ostream& os, const MessageSpec& what);
 };
+std::ostream& operator<<(std::ostream& os, const MessageSpec& what);
 
 using MessageSpecMap = std::map<const std::string, MessageSpec>;
 using FieldTraitOrder = std::multiset<const FieldTrait *, FieldTrait::PosCompare>;
