@@ -941,6 +941,7 @@ inline Tickval::ticks date_time_parse(const char *ptr, size_t len)
 		return Tickval(true).get_ticks();
 
 	Tickval::ticks result(Tickval::noticks);
+	int microsecond(0);
 	int millisecond(0);
 	tm tms {};
 
@@ -957,6 +958,11 @@ inline Tickval::ticks date_time_parse(const char *ptr, size_t len)
 	ptr += parse_decimal(ptr, 2, tms.tm_sec);
 	switch(len)
 	{
+	case 24: //_with_us: // 20230628-14:17:35.272452
+		parse_decimal(++ptr, 6, microsecond);
+		result = microsecond * Tickval::thousand;
+		result += time_to_epoch(tms) * Tickval::billion;
+		break;
 	case 21: //_with_ms: // 19981231-23:59:59.123
 		parse_decimal(++ptr, 3, millisecond);
 		result = millisecond * Tickval::million; // drop through
