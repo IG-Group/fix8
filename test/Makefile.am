@@ -70,7 +70,7 @@ endif
 $(libmyfix_la_SOURCES): $(XML_SCHEMA)
 	$(top_srcdir)/compiler/f8c $(LIBMYFIXFLAGS) --namespace TEX $(XML_SCHEMA) --fixt $(XML_FIXT_SCHEMA)
 
-POCO_LIBS = -lPocoFoundation -lPocoNet -lPocoUtil -lPocoXML
+POCO_LIBS = -lPocoFoundation$(POCO_LIBSUFFIX) -lPocoNet$(POCO_LIBSUFFIX) -lPocoUtil$(POCO_LIBSUFFIX) -lPocoXML$(POCO_LIBSUFFIX)
 GEN_LIBS = -lfix8 -lpthread
 if LINK_RT
 GEN_LIBS += -lrt
@@ -79,7 +79,7 @@ if BDBSUPPORT
 GEN_LIBS += -ldb_cxx
 endif
 if TBBSUPPORT
-GEN_LIBS += -ltbb
+GEN_LIBS += -ltbb$(TBB_LIBSUFFIX)
 endif
 if LIBMEMCACHEDSUPPORT
 GEN_LIBS += -lmemcached
@@ -110,10 +110,10 @@ hfprint_LDFLAGS += -lz
 harness_LDFLAGS += -lz
 endif
 if USESSL
-f8test_LDFLAGS += -lPocoNetSSL -lPocoCrypto
-f8print_LDFLAGS += -lPocoNetSSL -lPocoCrypto
-hftest_LDFLAGS += -lPocoNetSSL -lPocoCrypto
-hfprint_LDFLAGS += -lPocoNetSSL -lPocoCrypto
-harness_LDFLAGS += -lPocoNetSSL -lPocoCrypto
+f8test_LDFLAGS += -lPocoNetSSL$(POCO_LIBSUFFIX) -lPocoCrypto$(POCO_LIBSUFFIX)
+f8print_LDFLAGS += -lPocoNetSSL$(POCO_LIBSUFFIX) -lPocoCrypto$(POCO_LIBSUFFIX)
+hftest_LDFLAGS += -lPocoNetSSL$(POCO_LIBSUFFIX) -lPocoCrypto$(POCO_LIBSUFFIX)
+hfprint_LDFLAGS += -lPocoNetSSL$(POCO_LIBSUFFIX) -lPocoCrypto$(POCO_LIBSUFFIX)
+harness_LDFLAGS += -lPocoNetSSL$(POCO_LIBSUFFIX) -lPocoCrypto$(POCO_LIBSUFFIX)
 endif
 

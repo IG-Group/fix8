@@ -33,7 +33,7 @@
 #############################################################################################
 AUTOMAKE_OPTIONS = foreign dist-bzip2 dist-zip
 
-SUBDIRS = runtime compiler test util
+SUBDIRS = runtime compiler util
 
 if USEGTEST
 SUBDIRS += utests
@@ -79,7 +79,6 @@ ffdir = ${prefix}/include/fix8/ff
 sharedir = ${prefix}/share/fix8
 mandir = doc/man
 fix8mandir = ${sharedir}/man/man1
-testdir = ${sharedir}/test
 fix8htmldir = $(sharedir)/html
 schemadir = ${sharedir}/schema
 contribdir = ${sharedir}/contrib
@@ -91,9 +90,6 @@ PROCESS_MAN_PAGES = $(mandir)/f8c.1 $(mandir)/seqedit.1
 INSTALL_DATA_CONTRIB = contrib/FindFix8.cmake
 INSTALL_DATA_EXCHANGE_CONTRIB = contrib/exchangeSchemas/*
 
-INSTALL_DATA_LOCAL_TEST = test/hf_client.xml test/myfix_client.xml test/hf_client_include.xml \
-	test/hf_server.xml test/myfix_server.xml
-
 INSTALL_DATA_HTML_DOC = doc/html/*.js doc/html/*.html doc/html/*.png doc/html/*.css \
 	doc/fix8.doxygen doc/mainpage.doxygen doc/fix8.footer.html
 
@@ -103,10 +99,9 @@ INSTALL_DATA_HTML_SEARCH_DOC = doc/html/search/*.js doc/html/search/*.html doc/h
 INSTALL_DATA_LOCAL_SCHEMA = schema/*.xml schema/QUICKFIX-LICENCE
 
 install-data-local:
-	@$(mkinstalldirs) $(DESTDIR)$(testdir) $(DESTDIR)$(testdir)/run $(DESTDIR)$(schemadir)
 	@$(mkinstalldirs) $(DESTDIR)$(ffdir)/d $(DESTDIR)$(ffdir)/platforms $(DESTDIR)$(ffdir)/atomic $(DESTDIR)$(ffdir)/ocl
 	@$(mkinstalldirs) $(DESTDIR)$(fix8mandir) $(DESTDIR)$(contribdir) $(DESTDIR)$(exchangecontribdir)
-	$(INSTALL_DATA) $(INSTALL_DATA_LOCAL_TEST) $(DESTDIR)$(testdir)
+	@$(mkinstalldirs) $(DESTDIR)$(schemadir)
 	$(INSTALL_DATA) $(INSTALL_DATA_LOCAL_SCHEMA) $(DESTDIR)$(schemadir)
 	$(INSTALL_DATA) $(INSTALL_DATA_CONTRIB) $(DESTDIR)$(contribdir)
 	$(INSTALL_DATA) $(INSTALL_DATA_EXCHANGE_CONTRIB) $(DESTDIR)$(exchangecontribdir)

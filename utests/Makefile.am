@@ -61,7 +61,7 @@ EXTRA_FIELDS = "<field number='9999' name='SampleUserField'  type='STRING' messa
 $(libutest_la_SOURCES): $(XML_42_UTEST_SCHEMA)
 	$(top_srcdir)/compiler/f8c -sVp utest -n UTEST $(XML_42_UTEST_SCHEMA) -F $(EXTRA_FIELDS)
 
-AM_LDFLAGS = -lPocoFoundation -lPocoNet -lPocoUtil -lgtest -lgtest_main -lpthread
+AM_LDFLAGS = -lPocoFoundation$(POCO_LIBSUFFIX) -lPocoNet$(POCO_LIBSUFFIX) -lPocoUtil$(POCO_LIBSUFFIX) -lgtest -lgtest_main -lpthread
 
 if BDBSUPPORT
 AM_LDFLAGS += -ldb_cxx
@@ -70,10 +70,10 @@ if USECOMPRESSION
 AM_LDFLAGS += -lz
 endif
 if TBBSUPPORT
-AM_LDFLAGS += -ltbb
+AM_LDFLAGS += -ltbb$(TBB_LIBSUFFIX)
 endif
 if USESSL
-AM_LDFLAGS += -lPocoNetSSL -lPocoCrypto -lPocoXML
+AM_LDFLAGS += -lPocoNetSSL$(POCO_LIBSUFFIX) -lPocoCrypto$(POCO_LIBSUFFIX) -lPocoXML$(POCO_LIBSUFFIX)
 endif
 if LIBMEMCACHEDSUPPORT
 AM_LDFLAGS += -lmemcached

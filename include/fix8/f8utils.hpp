@@ -42,6 +42,7 @@ HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
 #include <string>
 #include <memory>
 #include <mutex>
+#include <cstring>
 
 #include <Poco/DateTime.h>
 #include <Poco/Net/SocketAddress.h>

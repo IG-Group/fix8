@@ -37,9 +37,9 @@ AM_CPPFLAGS = -I$(top_srcdir)/include
 
 f8c_SOURCES = 	f8c.cpp f8cutils.cpp f8cstatic.hpp f8c.hpp f8precomp.cpp precomp.cpp
 
-POCO_LIBS = -lPocoFoundation -lPocoNet -lPocoUtil
+POCO_LIBS = -lPocoFoundation$(POCO_LIBSUFFIX) -lPocoNet$(POCO_LIBSUFFIX) -lPocoUtil$(POCO_LIBSUFFIX)
 if USESSL
-POCO_LIBS += -lPocoNetSSL -lPocoCrypto -lPocoXML
+POCO_LIBS += -lPocoNetSSL$(POCO_LIBSUFFIX) -lPocoCrypto$(POCO_LIBSUFFIX) -lPocoXML$(POCO_LIBSUFFIX)
 endif
 
 f8c_LDFLAGS = -lfix8 $(POCO_LIBS) -L$(top_srcdir)/runtime
@@ -53,7 +53,7 @@ if BDBSUPPORT
 f8c_LDFLAGS += -ldb_cxx
 endif
 if TBBSUPPORT
-f8c_LDFLAGS += -ltbb
+f8c_LDFLAGS += -ltbb$(TBB_LIBSUFFIX)
 endif
 if LIBMEMCACHEDSUPPORT
 f8c_LDFLAGS += -lmemcached

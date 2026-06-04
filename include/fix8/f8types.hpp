@@ -39,6 +39,7 @@ HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
 //-------------------------------------------------------------------------------------------------
 #include <map>
 #include <algorithm>
+#include <cstring>
 
 //-------------------------------------------------------------------------------------------------
 namespace FIX8 {
